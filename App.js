@@ -18,7 +18,7 @@ import firebase from 'react-native-firebase';
 
 
 const FIREBAES_INSTANCE = firebase.database();
-FIREBAES_INSTANCE.goOnline();
+// FIREBAES_INSTANCE.goOnline();
 
 const { width, height } = Dimensions.get('window');
 
@@ -62,10 +62,7 @@ export default class App extends Component<Props> {
         latitudeDelta: 0.1,
         longitudeDelta: 0.1,
       },
-      markerPosition: {
-        latitude: 0,
-        longitude: 0,
-      },
+      markers: [],
       text: "test text",
     }
   }
@@ -115,10 +112,10 @@ export default class App extends Component<Props> {
     navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
     this.watchID = navigator.geolocation.watchPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
     const ref_firebase = FIREBAES_INSTANCE.ref();
-    ref_firebase.on('value', snape => {
-      console.log(snape.val());
-      const data = snape.val();
-      this.setState({ text: data.name });
+    ref_firebase.on('value', snap => {
+      console.log(snap.val());
+      const data = snap.val();
+      this.setState({ markers: data.markers });
     })
   }
 
@@ -134,9 +131,14 @@ export default class App extends Component<Props> {
           initialRegion={this.state.position}
           region={this.state.position}
         >
-          <Marker
-            coordinate={this.state.markerPosition}
-          />
+          {this.state.markers.length && this.state.markers.map(marker => {
+            return (
+              <Marker
+                key={marker.userID}
+                coordinate={marker}
+              />
+            )
+          })}
         </MapView>
         <Text style={styles.text}>{this.state.text}</Text>
       </View>
