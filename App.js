@@ -16,6 +16,10 @@ import {
 import MapView, { Marker } from 'react-native-maps';
 import firebase from 'react-native-firebase';
 
+
+const FIREBAES_INSTANCE = firebase.database();
+FIREBAES_INSTANCE.goOnline();
+
 const { width, height } = Dimensions.get('window');
 
 const SCREEN_WIDTH = width;
@@ -61,7 +65,8 @@ export default class App extends Component<Props> {
       markerPosition: {
         latitude: 0,
         longitude: 0,
-      }
+      },
+      text: "test text",
     }
   }
 
@@ -109,6 +114,12 @@ export default class App extends Component<Props> {
     console.log('COMPONENT MOUNTED');
     navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
     this.watchID = navigator.geolocation.watchPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
+    const ref_firebase = FIREBAES_INSTANCE.ref();
+    ref_firebase.on('value', snape => {
+      console.log(snape.val());
+      const data = snape.val();
+      this.setState({ text: data.name });
+    })
   }
 
   componentWillUnmount() {
@@ -127,6 +138,7 @@ export default class App extends Component<Props> {
             coordinate={this.state.markerPosition}
           />
         </MapView>
+        <Text style={styles.text}>{this.state.text}</Text>
       </View>
     );
   }
@@ -140,6 +152,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   map: {
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT / 2,
     left: 0,
     right: 0,
     top: 0,
@@ -151,4 +165,9 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
+  text: {
+    position: 'relative',
+    color: 'yellow',
+    bottom: -20,
+  }
 });
