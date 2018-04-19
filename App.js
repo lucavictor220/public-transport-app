@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
+import firebase from 'react-native-firebase';
 
 const { width, height } = Dimensions.get('window');
 

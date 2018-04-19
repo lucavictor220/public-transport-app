@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "526595283065",
+    "firebase_url": "https://thesis-1523375030198.firebaseio.com",
+    "project_id": "thesis-1523375030198",
+    "storage_bucket": "thesis-1523375030198.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:526595283065:android:32dbf3ccf48516cd",
+        "android_client_info": {
+          "package_name": "com.publictransportapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "526595283065-io9701n99vqbisr39uocu19o7l0tp652.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "526595283065-3u77757vkfjrpvc61lhpp8sa2irt6c1k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.publictransportapp",
+            "certificate_hash": "50a99597e67292aa6d3c543013c2f4df88b23d8a"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5BbywXdNyLDRID8euC8uMIHjcAp5_dr0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "526595283065-io9701n99vqbisr39uocu19o7l0tp652.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
