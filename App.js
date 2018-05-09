@@ -11,14 +11,15 @@ import {
   Text,
   View,
   Dimensions,
+  Image,
 } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
 import firebase from 'react-native-firebase';
+import api from './app/api/index';
 
 
-const FIREBAES_INSTANCE = firebase.database();
-// FIREBAES_INSTANCE.goOnline();
+const DB = firebase.database();
 
 const { width, height } = Dimensions.get('window');
 
@@ -59,11 +60,12 @@ export default class App extends Component<Props> {
       position: {
         latitude: 47.01667,
         longitude: 28.83333,
-        latitudeDelta: 0.1,
-        longitudeDelta: 0.1,
+        latitudeDelta: 0.4,
+        longitudeDelta: 0.4,
       },
       markers: [],
-      text: "test text",
+      stations: [],
+      user: {},
     }
   }
 
@@ -89,7 +91,7 @@ export default class App extends Component<Props> {
       return {
         ...state,
         position: { ...newPosition },
-        markerPosition: { latitude: newPosition.latitude, longitude: newPosition.longitude }
+        user: { userID: 3, location: { latitude: newPosition.latitude, longitude: newPosition.longitude } },
       }
     }, console.log(this.state));
   };
@@ -102,21 +104,42 @@ export default class App extends Component<Props> {
       return {
         ...state,
         position: { ...newPosition },
-        markerPosition: { latitude: newPosition.latitude, longitude: newPosition.longitude }
+        user: { userID: 3, location: { latitude: newPosition.latitude, longitude: newPosition.longitude } }
       }
     }, console.log(this.state));
   };
 
+  startWatching = () => {
+    setInterval(() => {
+      console.log('GET GEOLOCATION');
+      navigator.geolocation.getCurrentPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions)
+    }, 5000)
+  };
+
+  watchTransportLocation = () => {
+    const ref_firebase = DB.ref('markers/');
+    setInterval(() => {
+      ref_firebase.once('value', snap => {
+        const data = snap.val();
+        console.log('DATA');
+        console.log(data);
+        console.log('DATA');
+        this.setState({ markers: data || [] }, console.log('STATE: ', this.state));
+      })
+    }, 5000);
+  };
+
   componentDidMount() {
     console.log('COMPONENT MOUNTED');
+    // api.getRoutes().then(routes => {
+    //   console.log('ROUTES ARE:', routes.length);
+    //   this.setState({ stations: routes }, () => {
+    //   });
+    // });
     navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
-    this.watchID = navigator.geolocation.watchPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
-    const ref_firebase = FIREBAES_INSTANCE.ref();
-    ref_firebase.on('value', snap => {
-      console.log(snap.val());
-      const data = snap.val();
-      this.setState({ markers: data.markers });
-    })
+    // this.watchID = navigator.geolocation.watchPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
+    // this.startWatching();
+    this.watchTransportLocation()
   }
 
   componentWillUnmount() {
@@ -124,23 +147,39 @@ export default class App extends Component<Props> {
   }
 
   render() {
+    const { user, markers, stations } = this.state;
+    console.log('Render', new Date().toLocaleString());
+
     return (
       <View style={styles.container}>
         <MapView
           style={styles.map}
           initialRegion={this.state.position}
           region={this.state.position}
+          showsUserLocation
         >
-          {this.state.markers.length && this.state.markers.map(marker => {
+          {markers.length !== 0 && markers.map((marker, index) => {
+            const key = `trolleybus-marker-${index}`;
+            const coordinate = {
+              longitude: marker.longitude,
+              latitude: marker.latitude,
+            };
+
             return (
               <Marker
-                key={marker.userID}
-                coordinate={marker}
-              />
+                key={key}
+                coordinate={coordinate}
+              >
+                <Image
+                  onLoad={() => this.forceUpdate()}
+                  onLayout={() => this.forceUpdate()  }
+                  source={require('./app/public/trolleybus.png')}
+                  style={styles.imageMarker}
+                />
+              </Marker>
             )
           })}
         </MapView>
-        <Text style={styles.text}>{this.state.text}</Text>
       </View>
     );
   }
@@ -153,9 +192,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
+  radius: {
+    height: 50,
+    width: 50,
+    borderRadius: 50 / 2,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0, 122, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 112, 255, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageMarker: {
+    width: 20,
+    height: 20,
+    backgroundColor: '#FF7A00'
+  },
+  station: {
+    width: 4,
+    height: 4,
+    backgroundColor: 'green',
+    borderRadius: 4 / 2,
+  },
+  userMarker: {
+    height: 18,
+    width: 18,
+    borderWidth: 3,
+    borderColor: 'white',
+    borderRadius: 18 / 2,
+    overflow: 'hidden',
+    backgroundColor: '#007AFF',
+  },
   map: {
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT / 2,
+    height: SCREEN_HEIGHT,
     left: 0,
     right: 0,
     top: 0,
@@ -166,10 +236,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
-  },
-  text: {
-    position: 'relative',
-    color: 'yellow',
-    bottom: -20,
   }
 });
