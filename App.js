@@ -6,17 +6,15 @@
 
 import React, { Component } from 'react';
 import {
-  Platform,
   StyleSheet,
-  Text,
   View,
   Dimensions,
-  Image,
+  ListView,
 } from 'react-native';
 
 import MapView, { Marker } from 'react-native-maps';
 import firebase from 'react-native-firebase';
-import api from './app/api/index';
+import TransportMarker from './app/components/transportMarker';
 
 
 const DB = firebase.database();
@@ -116,21 +114,27 @@ export default class App extends Component<Props> {
     }, 5000)
   };
 
+  getTransportLocation = (dbRef) => {
+    dbRef.once('value', snap => {
+      const data = snap.val();
+      console.log('DATA');
+      console.log(data);
+      console.log('DATA');
+      this.setState({ markers: data || [] }, console.log('STATE: ', this.state));
+    })
+  };
+
   watchTransportLocation = () => {
-    const ref_firebase = DB.ref('markers/');
+    const dbRef = DB.ref('markers/');
     setInterval(() => {
-      ref_firebase.once('value', snap => {
-        const data = snap.val();
-        console.log('DATA');
-        console.log(data);
-        console.log('DATA');
-        this.setState({ markers: data || [] }, console.log('STATE: ', this.state));
-      })
+      this.getTransportLocation(dbRef);
     }, 5000);
   };
 
   componentDidMount() {
+    const dbRef = DB.ref('markers/');
     console.log('COMPONENT MOUNTED');
+    this.getTransportLocation(dbRef);
     // api.getRoutes().then(routes => {
     //   console.log('ROUTES ARE:', routes.length);
     //   this.setState({ stations: routes }, () => {
@@ -165,19 +169,7 @@ export default class App extends Component<Props> {
               latitude: marker.latitude,
             };
 
-            return (
-              <Marker
-                key={key}
-                coordinate={coordinate}
-              >
-                <Image
-                  onLoad={() => this.forceUpdate()}
-                  onLayout={() => this.forceUpdate()  }
-                  source={require('./app/public/trolleybus.png')}
-                  style={styles.imageMarker}
-                />
-              </Marker>
-            )
+            return <TransportMarker key={key} coordinate={coordinate} number={marker.nr} />
           })}
         </MapView>
       </View>
@@ -202,11 +194,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0, 112, 255, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  imageMarker: {
-    width: 20,
-    height: 20,
-    backgroundColor: '#FF7A00'
   },
   station: {
     width: 4,
