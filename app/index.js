@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { RootStack } from './config/routes';
+import { Tabs } from './config/routes';
 
 class App extends Component {
   constructor(props) {
@@ -8,7 +8,7 @@ class App extends Component {
 
   render() {
     return(
-      <RootStack />
+      <Tabs />
     )
   }
 }

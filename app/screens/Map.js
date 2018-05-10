@@ -31,6 +31,9 @@ const watchPositionOptions = {
 };
 
 class Map extends Component {
+  static navigationOptions = {
+    title: 'Map',
+  };
   constructor(props) {
     super(props);
 
@@ -46,10 +49,9 @@ class Map extends Component {
       user: {},
     }
   }
-  static navigationOptions = {
-    title: "Map",
-  };
 
+  watchUserLocationObject = {};
+  watchObject = {};
   watchID: ? number = null;
 
   createRegionObject = (position) => {
@@ -91,7 +93,7 @@ class Map extends Component {
   };
 
   startWatching = () => {
-    setInterval(() => {
+    watchUserLocationObject = setInterval(() => {
       console.log('GET GEOLOCATION');
       navigator.geolocation.getCurrentPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions)
     }, 5000)
@@ -109,7 +111,7 @@ class Map extends Component {
 
   watchTransportLocation = () => {
     const dbRef = DB.ref('markers/');
-    setInterval(() => {
+    return setInterval(() => {
       this.getTransportLocation(dbRef);
     }, 5000);
   };
@@ -121,15 +123,18 @@ class Map extends Component {
     navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
     // this.watchID = navigator.geolocation.watchPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
     // this.startWatching();
-    this.watchTransportLocation()
+    this.watchObject = this.watchTransportLocation();
   }
 
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.watchID);
+    console.log('Clear Timeout');
+    clearInterval(this.watchObject)
   }
 
   render() {
     const { user, markers, stations } = this.state;
+    console.log('POSITION Changed', this.state.position);
     console.log('Render', new Date().toLocaleString());
 
     return (
@@ -138,10 +143,11 @@ class Map extends Component {
           style={styles.map}
           initialRegion={this.state.position}
           region={this.state.position}
+          onRegionChangeComplete={position => this.setState({ position })}
           showsUserLocation
         >
           {markers.length !== 0 && markers.map((marker, index) => {
-            const key = `trolleybus-marker-${index}`;
+            const key = `transport-${index}`;
             const coordinate = {
               longitude: marker.longitude,
               latitude: marker.latitude,

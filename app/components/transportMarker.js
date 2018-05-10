@@ -15,7 +15,7 @@ export default class TransportMarker extends Component {
 
   render() {
     return(
-      <Marker key={this.props.key} coordinate={this.props.coordinate}>
+      <Marker coordinate={this.props.coordinate}>
         <View style={transportStyles.transportMarker}>
           <Text>{this.props.number}</Text>
         </View>
