@@ -4,44 +4,72 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Button } from 'react-native-elements'
-import { SCREEN_WIDTH } from "../config/settings";
+
+import { DB, SCREEN_WIDTH, GEOLOCATION_OPTIONS } from "../config/settings";
+import { convertToLocationObject } from '../utils/coordinates';
+
+let CURRENT_TRACK = 0;
 
 class Track extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      user: {
+        id: 1,
+      }
+    }
   }
 
-  static navigationOptions = {
-    title: "Track",
+  componentWillUnmount() {
+    console.log('Unmount and clear the object: ', this.watchUserLocationObject);
+    clearInterval(this.watchUserLocationObject)
+  }
+
+  watchUserLocationObject: {};
+
+  onLocationSuccess  = (position) => {
+    const newLocationInTrack = DB.ref('user-tracks/' + this.state.user.id + '/' + CURRENT_TRACK).push();
+    const locationData = convertToLocationObject(position);
+    console.log('Write data: ', locationData);
+    newLocationInTrack.set({
+      ...locationData,
+    });
+  };
+
+  onLocationFailure = (error) => {
+    console.log('Location service failed to retrieve data for user: ', this.state.user);
+    console.log('Reason:\n', error);
+  };
+
+  startWatching = () => {
+    console.log('Start watching...');
+    this.watchUserLocationObject = setInterval(() => {
+      console.log('GET GEOLOCATION');
+      navigator.geolocation.getCurrentPosition(this.onLocationSuccess, this.onLocationFailure, GEOLOCATION_OPTIONS)
+    }, 5000)
+  };
+
+  stopWatching = () => {
+    console.log('Stop watching.');
+    clearInterval(this.watchUserLocationObject);
+    CURRENT_TRACK++;
   };
 
   render() {
-    const { navigate } = this.props.navigation;
-
     return (
       <View style={styles.container}>
         <Button
           title="START"
           large
-          onPress={() =>
-            navigate('Map', { name: 'MapScreen' })
-          }
+          onPress={() => this.startWatching()}
           buttonStyle={styles.startButton}
         />
         <Button
           title="STOP"
           large
-          onPress={() =>
-            navigate('Map', { name: 'MapScreen' })
-          }
+          onPress={() => this.stopWatching()}
           buttonStyle={styles.stopButton}
-
-        />
-        <Button
-          title="Go to Map screen"
-          onPress={() =>
-            navigate('Map', { name: 'MapScreen' })
-          }
         />
       </View>
     )

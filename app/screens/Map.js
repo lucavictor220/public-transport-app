@@ -8,32 +8,7 @@ import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, LATITUDE_DELTA, LONGITUDE_DELTA } from
 import TransportMarker from '../components/transportMarker';
 
 
-
-const onCurrentPositionGeolocationFailure = (geo_error) => {
-  console.log('onCurrentPositionGeolocationFailure called');
-  alert(JSON.stringify(geo_error))
-};
-
-const onWatchPositionGeolocationFailure = (geo_error) => {
-  console.log('onWatchPositionGeolocationFailure called');
-  alert(JSON.stringify(geo_error))
-};
-
-const geolocationOptions = {
-  enableHighAccuracy: false,
-  timeout: 60000,
-};
-
-const watchPositionOptions = {
-  timeout: 60000,
-  enableHighAccuracy: false,
-  useSignificantChanges: false,
-};
-
 class Map extends Component {
-  static navigationOptions = {
-    title: 'Map',
-  };
   constructor(props) {
     super(props);
 
@@ -54,57 +29,13 @@ class Map extends Component {
   watchObject = {};
   watchID: ? number = null;
 
-  createRegionObject = (position) => {
-    let lat = parseFloat(position.coords.latitude);
-    let long = parseFloat(position.coords.longitude);
-
-    return {
-      latitude: lat,
-      longitude: long,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    };
-  };
-
-  onCurrentLocationSuccess  = (position) => {
-    console.log('CALL onCurrentLocationSuccess');
-    const newPosition = this.createRegionObject(position);
-    console.log(newPosition);
-    this.setState((state) => {
-      return {
-        ...state,
-        position: { ...newPosition },
-        user: { userID: 3, location: { latitude: newPosition.latitude, longitude: newPosition.longitude } },
-      }
-    }, console.log(this.state));
-  };
-
-  onWatchPositionSuccess  = (position) => {
-    console.log('CALL onWatchPositionSuccess');
-    const newPosition = this.createRegionObject(position);
-    console.log(newPosition);
-    this.setState((state) => {
-      return {
-        ...state,
-        position: { ...newPosition },
-        user: { userID: 3, location: { latitude: newPosition.latitude, longitude: newPosition.longitude } }
-      }
-    }, console.log(this.state));
-  };
-
-  startWatching = () => {
-    watchUserLocationObject = setInterval(() => {
-      console.log('GET GEOLOCATION');
-      navigator.geolocation.getCurrentPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions)
-    }, 5000)
-  };
 
   getTransportLocation = (dbRef) => {
     dbRef.once('value', snap => {
       const data = snap.val();
-      console.log('DATA');
-      console.log(data);
-      console.log('DATA');
+      // console.log('DATA');
+      // console.log(data);
+      // console.log('DATA');
       this.setState({ markers: data || [] }, console.log('STATE: ', this.state));
     })
   };
@@ -120,9 +51,8 @@ class Map extends Component {
     const dbRef = DB.ref('markers/');
     console.log('COMPONENT MOUNTED');
     this.getTransportLocation(dbRef);
-    navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
-    // this.watchID = navigator.geolocation.watchPosition(this.onWatchPositionSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
-    // this.startWatching();
+    // navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
+    // this.watchID = navigator.geolocation.watchPosition(this.onLocationSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
     this.watchObject = this.watchTransportLocation();
   }
 
@@ -134,8 +64,6 @@ class Map extends Component {
 
   render() {
     const { user, markers, stations } = this.state;
-    console.log('POSITION Changed', this.state.position);
-    console.log('Render', new Date().toLocaleString());
 
     return (
       <View style={styles.container}>
@@ -145,6 +73,8 @@ class Map extends Component {
           region={this.state.position}
           onRegionChangeComplete={position => this.setState({ position })}
           showsUserLocation
+          // onUserLocationChange={(LatLng) => console.log('Position NOW: ', LatLng.coordinate)}
+          loadingEnabled
         >
           {markers.length !== 0 && markers.map((marker, index) => {
             const key = `transport-${index}`;
