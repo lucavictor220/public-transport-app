@@ -30,9 +30,8 @@ allprojects {
  + Project-wide Gradle configuration properties
  */
 ext {
-    compileSdkVersion   = 26
-    targetSdkVersion    = 26
-    buildToolsVersion   = "26.0.2"
+    compileSdkVersion   = 27
+    targetSdkVersion    = 27
     supportLibVersion   = "26.1.0"
     googlePlayServicesVersion = "11.8.0"
     androidMapsUtilsVersion = "0.5+"

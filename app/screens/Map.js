@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  Text,
 } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, LATITUDE_DELTA, LONGITUDE_DELTA } from '../config/settings';
-import TransportMarker from '../components/transportMarker';
+// import TransportMarker from '../components/transportMarker';
 
 
 class Map extends Component {
@@ -83,7 +84,13 @@ class Map extends Component {
               latitude: marker.latitude,
             };
 
-            return <TransportMarker key={key} coordinate={coordinate} number={marker.nr} />
+            return (
+              <Marker key={key} coordinate={coordinate}>
+                <View style={styles.transportMarker}>
+                  <Text>{marker.nr}</Text>
+                </View>
+              </Marker>
+            )
           })}
         </MapView>
       </View>
@@ -137,6 +144,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  transportMarker: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderColor: '#2e7af4',
+    borderWidth: 1,
   }
 });
 
