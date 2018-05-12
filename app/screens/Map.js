@@ -5,7 +5,7 @@ import {
   Text,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, LATITUDE_DELTA, LONGITUDE_DELTA } from '../config/settings';
+import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, GEOLOCATION_OPTIONS } from '../config/settings';
 // import TransportMarker from '../components/transportMarker';
 
 
@@ -28,7 +28,7 @@ class Map extends Component {
 
   watchUserLocationObject = {};
   watchObject = {};
-  watchID: ? number = null;
+  // watchID: ? number = null;
 
 
   getTransportLocation = (dbRef) => {
@@ -48,17 +48,25 @@ class Map extends Component {
     }, 5000);
   };
 
+  // onCurrentLocationSuccess = (position) => {
+  //   console.log('POSITION: ', position);
+  //   this.setState(() => ({ user: position.coordinates }))
+  // };
+  //
+  // onCurrentPositionGeolocationFailure = (error) => {
+  //   console.log(error);
+  // };
+
   componentDidMount() {
     const dbRef = DB.ref('markers/');
     console.log('COMPONENT MOUNTED');
     this.getTransportLocation(dbRef);
-    // navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, onCurrentPositionGeolocationFailure, geolocationOptions);
+    // navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, this.onCurrentPositionGeolocationFailure, GEOLOCATION_OPTIONS);
     // this.watchID = navigator.geolocation.watchPosition(this.onLocationSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
     this.watchObject = this.watchTransportLocation();
   }
 
   componentWillUnmount() {
-    navigator.geolocation.clearWatch(this.watchID);
     console.log('Clear Timeout');
     clearInterval(this.watchObject)
   }
@@ -76,6 +84,7 @@ class Map extends Component {
           showsUserLocation
           // onUserLocationChange={(LatLng) => console.log('Position NOW: ', LatLng.coordinate)}
           loadingEnabled
+          showsMyLocationButton
         >
           {markers.length !== 0 && markers.map((marker, index) => {
             const key = `transport-${index}`;
@@ -100,8 +109,12 @@ class Map extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'flex-end',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
@@ -132,13 +145,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#007AFF',
   },
   map: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
-    position: 'absolute',
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
   },
   instructions: {
     textAlign: 'center',

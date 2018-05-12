@@ -21,7 +21,7 @@
       "package": "com.publictransportapp",
       "versionCode": 1,
       "icon": "./assets/app-icon.png",
-      "permissions": ["ACCESS_FINE_LOCATION"],
+      "permissions": ["INTERNET, ACCESS_FINE_LOCATION"],
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyCD1b6RHi7KPJhuTX_CIf53mjqtlIEFJeA"
