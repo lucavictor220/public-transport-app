@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, GEOLOCATION_OPTIONS } from '../config/settings';
-// import TransportMarker from '../components/transportMarker';
+import TransportMarker from '../components/TransportMarker';
 
 
 class Map extends Component {
@@ -28,8 +28,21 @@ class Map extends Component {
 
   watchUserLocationObject = {};
   watchObject = {};
-  // watchID: ? number = null;
 
+
+  componentDidMount() {
+    const dbRef = DB.ref('markers/');
+    console.log('COMPONENT MOUNTED');
+    this.getTransportLocation(dbRef);
+    // navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, this.onCurrentPositionGeolocationFailure, GEOLOCATION_OPTIONS);
+    // this.watchID = navigator.geolocation.watchPosition(this.onLocationSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
+    this.watchObject = this.watchTransportLocation();
+  }
+
+  componentWillUnmount() {
+    console.log('Clear Timeout');
+    clearInterval(this.watchObject)
+  }
 
   getTransportLocation = (dbRef) => {
     dbRef.once('value', snap => {
@@ -57,20 +70,6 @@ class Map extends Component {
   //   console.log(error);
   // };
 
-  componentDidMount() {
-    const dbRef = DB.ref('markers/');
-    console.log('COMPONENT MOUNTED');
-    this.getTransportLocation(dbRef);
-    // navigator.geolocation.getCurrentPosition(this.onCurrentLocationSuccess, this.onCurrentPositionGeolocationFailure, GEOLOCATION_OPTIONS);
-    // this.watchID = navigator.geolocation.watchPosition(this.onLocationSuccess, onWatchPositionGeolocationFailure, watchPositionOptions);
-    this.watchObject = this.watchTransportLocation();
-  }
-
-  componentWillUnmount() {
-    console.log('Clear Timeout');
-    clearInterval(this.watchObject)
-  }
-
   render() {
     const { user, markers, stations } = this.state;
 
@@ -93,13 +92,7 @@ class Map extends Component {
               latitude: marker.latitude,
             };
 
-            return (
-              <Marker key={key} coordinate={coordinate}>
-                <View style={styles.transportMarker}>
-                  <Text>{marker.nr}</Text>
-                </View>
-              </Marker>
-            )
+            return (<TransportMarker key={key} coordinate={coordinate} nr={marker.nr}/>)
           })}
         </MapView>
       </View>
@@ -157,16 +150,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
-  },
-  transportMarker: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderColor: '#2e7af4',
-    borderWidth: 1,
   }
 });
 
