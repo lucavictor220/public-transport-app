@@ -25,6 +25,7 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="AIzaSyCD1b6RHi7KPJhuTX_CIf53mjqtlIEFJeA"/>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        <service android:name="com.xebia.activityrecognition.DetectionService"/>
     </application>
 
 </manifest>

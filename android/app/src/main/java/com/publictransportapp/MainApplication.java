@@ -3,6 +3,7 @@ package com.publictransportapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.xebia.activityrecognition.RNActivityRecognitionPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import io.invertase.firebase.RNFirebasePackage;
@@ -28,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNActivityRecognitionPackage(),
             new VectorIconsPackage(),
             new MapsPackage(),
             new RNFirebasePackage(),
