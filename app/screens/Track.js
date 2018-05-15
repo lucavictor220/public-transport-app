@@ -20,7 +20,7 @@ class Track extends Component {
       user: {
         id: 1,
       },
-      activity: 'NOTHING',
+      activity: 'UNKNOWN',
     }
   }
   unsubscribe: {};
@@ -34,7 +34,7 @@ class Track extends Component {
       console.log('mostProbableActivity');
       this.setState({ activity: mostProbableActivity.type })
     });
-    const detectionIntervalMillis = 1000;
+    const detectionIntervalMillis = 3000;
     ActivityRecognition.start(detectionIntervalMillis)
   }
 
