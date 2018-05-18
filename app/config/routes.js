@@ -1,15 +1,17 @@
 import React from 'react';
 import { TabNavigator } from 'react-navigation';
-import { Icon } from 'react-native-elements';
 
 import MapScreen from '../screens/Map';
 import TrackScreen from '../screens/Track';
-
+import LoadingScreen from '../screens/Loading';
+import SignUpScreen from '../screens/SignUp';
+import LoginScreen from '../screens/Login';
+import MainScreen from '../screens/Main';
 
 const tabNavigatorConfig = {
   tabBarPosition: 'top',
   swipeEnabled: true,
-  initialRouteName: 'Map',
+  initialRouteName: 'Loading',
   tabBarOptions: {
     activeTintColor: '#fff',
     inactiveTintColor: '#fff',
@@ -27,4 +29,9 @@ const tabNavigatorConfig = {
 export const RootStack = TabNavigator({
   Map: MapScreen,
   Track: TrackScreen,
+  Loading: LoadingScreen,
+  SignUp: SignUpScreen,
+  Login: LoginScreen,
+  Main: MainScreen,
+
 }, tabNavigatorConfig);

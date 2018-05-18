@@ -7,10 +7,10 @@ if (typeof(Number.prototype.toRadians) === "undefined") {
 
 export const calculateDistance = (point1, point2) => {
   const R = 6371000; // earth Radius
-  const lat1 = point1.latitude;
-  const lon1 = point1.longitude;
-  const lat2 = point2.latitude;
-  const lon2 = point2.longitude;
+  const lat1 = parseFloat(point1.latitude);
+  const lon1 = parseFloat(point1.longitude);
+  const lat2 = parseFloat(point2.latitude);
+  const lon2 = parseFloat(point2.longitude);
 
   const fi1 = lat1.toRadians();
   const fi2 = lat2.toRadians();
