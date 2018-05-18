@@ -95,3 +95,5 @@ ios/Pods
 
 # ====== Ignore keystore key ======
 android/app/public-transport-key.keystore
+
+app.json

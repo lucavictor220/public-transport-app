@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, TextInput, View, Button } from 'react-native';
+import { StyleSheet } from 'react-native';
 import firebase from 'react-native-firebase';
+import { Container, Header, Content, Form, Item, Input, Label, Button, Text, Left, Title, Icon, Body, Right } from 'native-base';
 
 
 class SignUp extends React.Component {
@@ -24,42 +25,48 @@ class SignUp extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Sign Up</Text>
-        {this.state.errorMessage &&
-        <Text style={{ color: 'red' }}>
-          {this.state.errorMessage}
-        </Text>}
-        <TextInput
-          placeholder="Email"
-          autoCapitalize="none"
-          style={styles.textInput}
-          onChangeText={email => this.setState({ email })}
-          value={this.state.email}
-        />
-        <TextInput
-          secureTextEntry
-          placeholder="Password"
-          autoCapitalize="none"
-          style={styles.textInput}
-          onChangeText={password => this.setState({ password })}
-          value={this.state.password}
-        />
-        <Button title="Sign Up" onPress={this.handleSignUp} />
-        <Button
-          title="Already have an account? Login"
-          onPress={() => this.props.navigation.navigate('Login')}
-        />
-      </View>
-    )
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent>
+              <Icon name='menu' />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Header</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content>
+          <Form>
+            <Item floatingLabel>
+              <Label>Email</Label>
+              <Input />
+            </Item>
+            <Item floatingLabel last>
+              <Label>Password</Label>
+              <Input />
+            </Item>
+          </Form>
+          <Button full onPress={this.handleSignUp} style={styles.signUpButton}>
+            <Text>Sign Up</Text>
+          </Button>
+          <Button onPress={() => this.props.navigation.navigate('Login')}>
+            <Text>Already have an account? Login</Text>
+          </Button>
+        </Content>
+      </Container>
+    );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center'
+  },
+  signUpButton: {
+    marginTop: 10,
+    marginBottom: 10,
   },
   textInput: {
     height: 40,

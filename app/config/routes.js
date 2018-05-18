@@ -1,5 +1,5 @@
 import React from 'react';
-import { TabNavigator } from 'react-navigation';
+import { createMaterialTopTabNavigator } from 'react-navigation';
 
 import MapScreen from '../screens/Map';
 import TrackScreen from '../screens/Track';
@@ -26,7 +26,7 @@ const tabNavigatorConfig = {
   }
 };
 
-export const RootStack = TabNavigator({
+export const RootStack = createMaterialTopTabNavigator({
   Map: MapScreen,
   Track: TrackScreen,
   Loading: LoadingScreen,
