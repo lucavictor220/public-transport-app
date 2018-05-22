@@ -9,6 +9,7 @@ import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, GEOLOCATION_OPTIONS } from '../config/
 import TransportMarker from '../components/TransportMarker';
 
 
+
 class Map extends Component {
   constructor(props) {
     super(props);
@@ -47,9 +48,9 @@ class Map extends Component {
   getTransportLocation = (dbRef) => {
     dbRef.once('value', snap => {
       const data = snap.val();
-      // console.log('DATA');
-      // console.log(data);
-      // console.log('DATA');
+      console.log('DATA');
+      console.log(data);
+      console.log('DATA');
       this.setState({ markers: data || [] }, console.log('STATE: ', this.state));
     })
   };

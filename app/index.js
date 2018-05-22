@@ -1,3 +1,4 @@
+import { Root } from "native-base";
 import React, { Component } from 'react';
 import { RootStack } from './config/routes';
 
@@ -8,7 +9,9 @@ class App extends Component {
 
   render() {
     return(
-      <RootStack />
+      <Root>
+        <RootStack />
+      </Root>
     )
   }
 }

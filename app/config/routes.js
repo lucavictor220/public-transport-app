@@ -1,9 +1,9 @@
 import React from 'react';
 import { TabNavigator } from 'react-navigation';
-import { Icon } from 'react-native-elements';
 
 import MapScreen from '../screens/Map';
 import TrackScreen from '../screens/Track';
+import QuestionScreen from '../screens/Question';
 
 
 const tabNavigatorConfig = {
@@ -27,4 +27,5 @@ const tabNavigatorConfig = {
 export const RootStack = TabNavigator({
   Map: MapScreen,
   Track: TrackScreen,
+  Question: QuestionScreen,
 }, tabNavigatorConfig);

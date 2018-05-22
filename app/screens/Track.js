@@ -1,16 +1,27 @@
 import React, { Component } from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-} from 'react-native';
-import { Button } from 'react-native-elements'
-
-import { DB, SCREEN_WIDTH, GEOLOCATION_OPTIONS } from "../config/settings";
+import { Container, Header, Button, Content, ActionSheet, Text } from "native-base";
+import { DB } from "../config/settings";
 import { convertToLocationObject } from '../utils/coordinates';
+import createTransport from '../models/transport';
+import createQuestion from '../models/question';
 import ActivityRecognition from 'react-native-activity-recognition'
 
 let CURRENT_TRACK = 0;
+
+const mockQuestionData = [
+  {
+    type: 'trolleybus',
+    nr: 10,
+  },
+  {
+    type: 'trolleybus',
+    nr: 11,
+  },
+  {
+    type: 'bus',
+    nr: 26,
+  },
+];
 
 class Track extends Component {
   constructor(props) {
@@ -20,21 +31,23 @@ class Track extends Component {
       user: {
         id: 1,
       },
-      activity: 'NOTHING',
+      transport: {},
+      activity: 'UNKNOWN',
     }
   }
-  unsubscribe: {};
+  unsubscribe = ActivityRecognition.subscribe(detectedActivities => {
+    const mostProbableActivity = detectedActivities.sorted[0];
+    console.log('mostProbableActivity');
+    console.log(mostProbableActivity);
+    console.log('mostProbableActivity');
+    this.setState({ activity: mostProbableActivity.type }, () => this.isInPublicTransport())
+  });
   watchUserLocationObject: {};
 
   componentDidMount() {
-    this.unsubscribe = ActivityRecognition.subscribe(detectedActivities => {
-      const mostProbableActivity = detectedActivities.sorted[0];
-      console.log('mostProbableActivity');
-      console.log(mostProbableActivity);
-      console.log('mostProbableActivity');
-      this.setState({ activity: mostProbableActivity.type })
-    });
-    const detectionIntervalMillis = 1000;
+    console.log('Call subscribe');
+    const detectionIntervalMillis = 10000;
+    console.log('Call Start activity recognition');
     ActivityRecognition.start(detectionIntervalMillis)
   }
 
@@ -46,8 +59,26 @@ class Track extends Component {
     this.unsubscribe()
   }
 
+  isInPublicTransport = () => {
+    if (this.state.activity === 'WALKING') this.openQuestion()
+  };
+
+  openQuestion = () => {
+    const actionSheetOptions = createQuestion(mockQuestionData);
+    ActionSheet.show(
+      {
+        ...actionSheetOptions,
+      },
+      buttonIndex => {
+        console.log(mockQuestionData[buttonIndex]);
+        this.setState({ transport: mockQuestionData[buttonIndex] });
+      }
+    );
+  };
+
+
   onLocationSuccess  = (position) => {
-    const newLocationInTrack = DB.ref('user-tracks/' + this.state.user.id + '/' + CURRENT_TRACK).push();
+    const newLocationInTrack = DB.ref('markers/' + this.state.user.id);
     const locationData = convertToLocationObject(position);
     console.log('Write data: ', locationData);
     newLocationInTrack.set({
@@ -60,7 +91,7 @@ class Track extends Component {
     console.log('Reason:\n', error);
   };
 
-  startWatching = () => {
+  watchUserLocation = () => {
     console.log('Start watching...');
     this.watchUserLocationObject = setInterval(() => {
       console.log('GET GEOLOCATION');
@@ -76,46 +107,32 @@ class Track extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text>{this.state.activity}</Text>
-        <Button
-          title="START"
-          large
-          onPress={() => this.startWatching()}
-          buttonStyle={styles.startButton}
-        />
-        <Button
-          title="STOP"
-          large
-          onPress={() => this.stopWatching()}
-          buttonStyle={styles.stopButton}
-        />
-      </View>
+      <Container>
+        <Content padder>
+          <Text>Activity: {this.state.activity}</Text>
+          <Button
+            full
+            large
+            style={{ marginTop: 10, marginBottom: 10}}
+            onPress={() => this.openQuestion()}
+          >
+            <Text>Start</Text>
+          </Button>
+          <Button
+            full
+            large
+            style={{ marginTop: 10, marginBottom: 10}}
+            onPress={() => this.stopWatching()}
+          >
+            <Text>STOP</Text>
+          </Button>
+        </Content>
+      </Container>
     )
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  startButton: {
-    width: SCREEN_WIDTH,
-    marginTop: 10,
-    marginBottom: 10,
-    backgroundColor: "#50ed82",
-  },
-  stopButton: {
-    width: SCREEN_WIDTH,
-    marginTop: 10,
-    marginBottom: 10,
-    backgroundColor: "#f23c51",
-  }
 
-});
 
 
 export default Track;
