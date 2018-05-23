@@ -11,6 +11,7 @@ export const SCREEN_HEIGHT = height;
 export const ASPECT_RATIO = SCREEN_WIDTH / SCREEN_HEIGHT;
 export const LATITUDE_DELTA = 0.0922;
 export const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+export const QUESTION_ACTIVITY = 'STILL'; // STILL, IN_VEHICLE
 
 export const GEOLOCATION_OPTIONS = {
   enableHighAccuracy: true,

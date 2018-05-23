@@ -5,7 +5,7 @@ import {
   Text,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { DB, SCREEN_WIDTH, SCREEN_HEIGHT, GEOLOCATION_OPTIONS } from '../config/settings';
+import { DB, SCREEN_WIDTH, SCREEN_HEIGHT } from '../config/settings';
 import TransportMarker from '../components/TransportMarker';
 
 
@@ -41,17 +41,21 @@ class Map extends Component {
   }
 
   componentWillUnmount() {
-    console.log('Clear Timeout');
+    console.log('Clear Timeout why?');
     clearInterval(this.watchObject)
   }
 
   getTransportLocation = (dbRef) => {
     dbRef.once('value', snap => {
+      if (!snap.val()) {
+        console.log('No transport at all!!!');
+        return;
+      }
       const data = snap.val();
       console.log('DATA');
-      console.log(data);
+      console.log(Object.values(data));
       console.log('DATA');
-      this.setState({ markers: data || [] }, console.log('STATE: ', this.state));
+      this.setState({ markers: Object.values(data) || [] }, console.log('STATE: ', this.state.markers));
     })
   };
 
@@ -72,7 +76,12 @@ class Map extends Component {
   // };
 
   render() {
-    const { user, markers, stations } = this.state;
+    let { user, markers, stations } = this.state;
+    markers = markers.filter(item => item !== null || item !== undefined);
+    console.log('MARKERS');
+    console.log(markers);
+    console.log('MARKERS');
+
 
     return (
       <View style={styles.container}>

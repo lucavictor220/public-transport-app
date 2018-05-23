@@ -1,7 +1,7 @@
 export const convertToLocationObject = (position) => {
   return {
+    latitude: parseFloat(position.coords.latitude),
+    longitude: parseFloat(position.coords.longitude),
     timestamp: position.timestamp,
-    lat: parseFloat(position.coords.latitude),
-    long: parseFloat(position.coords.longitude),
   }
 };

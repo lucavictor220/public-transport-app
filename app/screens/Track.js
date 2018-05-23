@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
+import ActivityRecognition from 'react-native-activity-recognition'
 import { Container, Header, Button, Content, ActionSheet, Text } from "native-base";
-import { DB } from "../config/settings";
+import { DB, GEOLOCATION_OPTIONS, QUESTION_ACTIVITY } from "../config/settings";
 import { convertToLocationObject } from '../utils/coordinates';
 import createTransport from '../models/transport';
 import createQuestion from '../models/question';
-import ActivityRecognition from 'react-native-activity-recognition'
 
-let CURRENT_TRACK = 0;
 
 const mockQuestionData = [
   {
@@ -29,12 +28,14 @@ class Track extends Component {
 
     this.state = {
       user: {
-        id: 1,
+        id: 4,
       },
-      transport: {},
+      transport: null,
       activity: 'UNKNOWN',
+      feedbackDone: false,
     }
   }
+
   unsubscribe = ActivityRecognition.subscribe(detectedActivities => {
     const mostProbableActivity = detectedActivities.sorted[0];
     console.log('mostProbableActivity');
@@ -56,11 +57,14 @@ class Track extends Component {
     clearInterval(this.watchUserLocationObject);
 
     ActivityRecognition.stop();
-    this.unsubscribe()
+    this.unsubscribe();
+    this.stopWatching();
   }
 
   isInPublicTransport = () => {
-    if (this.state.activity === 'WALKING') this.openQuestion()
+    if (this.state.activity === QUESTION_ACTIVITY && !this.state.feedbackDone) {
+      this.openQuestion();
+    }
   };
 
   openQuestion = () => {
@@ -71,23 +75,36 @@ class Track extends Component {
       },
       buttonIndex => {
         console.log(mockQuestionData[buttonIndex]);
-        this.setState({ transport: mockQuestionData[buttonIndex] });
+        if (buttonIndex > mockQuestionData.length-1) return;
+        this.setState({
+          transport: createTransport(mockQuestionData[buttonIndex]),
+          feedbackDone: true
+        }, () => this.shouldStartWatching());
       }
     );
   };
 
+  shouldStartWatching = () => {
+    if (this.state.transport) {
+      this.watchUserLocation()
+    }
+  };
 
   onLocationSuccess  = (position) => {
-    const newLocationInTrack = DB.ref('markers/' + this.state.user.id);
-    const locationData = convertToLocationObject(position);
-    console.log('Write data: ', locationData);
-    newLocationInTrack.set({
-      ...locationData,
+    const markerObject = DB.ref('markers/' + this.state.transport.id);
+    const coordinates = convertToLocationObject(position);
+    const transportObject = {
+      ...this.state.transport,
+      ...coordinates,
+    };
+    console.log('New key: ', markerObject);
+    markerObject.set({
+      ...transportObject,
     });
   };
 
   onLocationFailure = (error) => {
-    console.log('Location service failed to retrieve data for user: ', this.state.user);
+    console.log('Location service failed to retrieve data for user: ', this.state.user.id);
     console.log('Reason:\n', error);
   };
 
@@ -102,14 +119,21 @@ class Track extends Component {
   stopWatching = () => {
     console.log('Stop watching.');
     clearInterval(this.watchUserLocationObject);
-    CURRENT_TRACK++;
+    console.log('Remove object');
+    DB.ref('markers/' + this.state.transport.id).remove();
   };
 
   render() {
+    const feedbackNotification = this.state.feedbackDone ? 'Thank you for your contribution!' : 'No contribution yet.';
+
     return (
       <Container>
         <Content padder>
           <Text>Activity: {this.state.activity}</Text>
+          {this.state.transport &&
+            <Text>Transport: {this.state.transport.type} {this.state.transport.nr}</Text>
+          }
+          <Text>{feedbackNotification}</Text>
           <Button
             full
             large
